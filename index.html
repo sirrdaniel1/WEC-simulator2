@@ -2,481 +2,156 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Two-Body Wave Energy Converter – Physics Simulation</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Wave Energy Converter – Mechanical Animation</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  *{box-sizing:border-box}
-html,body{height:100%;margin:0}
-body{font-family:'Inter',system-ui,sans-serif;background:#030712;color:#f3f4f6;overflow:hidden;user-select:none;font-size:13px}
-.mono,.cards b,#rows span:last-child,.box b{font-family:'JetBrains Mono',monospace}
-#canvas-container{position:absolute;inset:0;z-index:0}
-#canvas-container canvas{display:block;width:100vw;height:100vh}
-.hidden{display:none!important}
-
-#ui{position:relative;z-index:10;height:100%;display:flex;flex-direction:column;justify-content:space-between;padding:16px 20px;pointer-events:none;gap:10px}
-#ui>*{pointer-events:none}
-.glass,.gbtn{pointer-events:auto}
-.glass{background:rgba(15,23,42,.85);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 40px rgba(0,0,0,.6);border-radius:16px}
-
-header{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
-.brand{display:flex;gap:12px;align-items:center;padding:10px 16px;border-left:4px solid #38bdf8}
-.brand h1{margin:0;font-size:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.brand p{margin:0;font-size:11px;color:#94a3b8}
-.logo{width:38px;height:38px;border-radius:10px;background:rgba(14,165,233,.2);color:#38bdf8;display:grid;place-items:center;font-size:18px}
-.badge{font-size:9px;text-transform:uppercase;letter-spacing:.08em;padding:2px 8px;border-radius:99px;background:rgba(16,185,129,.2);color:#34d399;border:1px solid rgba(16,185,129,.3);font-weight:600}
-.camrow{display:flex;gap:6px;padding:6px;flex-wrap:wrap;align-items:center}
-
-.gbtn{background:rgba(30,41,59,.7);color:#e2e8f0;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px 12px;font:600 12px 'Inter',sans-serif;cursor:pointer;transition:all .2s;display:inline-flex;gap:6px;align-items:center;justify-content:center}
-.gbtn:hover{background:rgba(51,65,85,.9);border-color:rgba(56,189,248,.5);transform:translateY(-1px)}
-.gbtn.active{background:rgba(14,165,233,.25);border-color:#38bdf8;color:#38bdf8;box-shadow:0 0 15px rgba(56,189,248,.3)}
-.gbtn.wide{width:100%;margin-top:8px}
-
-#mid{flex:1;min-height:0;display:flex;justify-content:space-between;align-items:flex-start;gap:16px}
-.side{width:340px;max-height:100%;overflow-y:auto;padding:14px 16px}
-.title{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(100,116,139,.5);padding-bottom:8px;margin-bottom:10px;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#e2e8f0}
-.title b{color:#38bdf8;font:700 11px 'JetBrains Mono',monospace}
-.title i.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#34d399;margin-right:6px;animation:ping 1.4s infinite}
-@keyframes ping{50%{opacity:.25}}
-h3{margin:14px 0 6px;font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8}
-.note{font-size:10.5px;color:#7b8ca0;margin:8px 0 0}
-
-.cards{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.card{background:rgba(15,23,42,.6);border:1px solid;border-radius:12px;padding:8px 10px}
-.card span{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;font-weight:600}
-.card div{display:flex;justify-content:space-between;align-items:baseline;margin-top:4px}
-.card b{font-size:17px;font-variant-numeric:tabular-nums}
-.card em{font-style:normal;font-size:10px;opacity:.7}
-.amber{border-color:rgba(245,158,11,.25);color:#fcd34d}.amber span{color:#fbbf24}
-.sky{border-color:rgba(14,165,233,.25);color:#7dd3fc}.sky span{color:#38bdf8}
-.indigo{border-color:rgba(99,102,241,.25);color:#a5b4fc}.indigo span{color:#818cf8}
-.emerald{border-color:rgba(16,185,129,.25);color:#6ee7b7}.emerald span{color:#34d399}
-.slate{border-color:rgba(100,116,139,.35);color:#e2e8f0}.slate span{color:#94a3b8}
-
-#rows .r{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dotted rgba(100,116,139,.3)}
-#rows .r span:first-child{color:#94a3b8}
-#rows .r span:last-child{font-variant-numeric:tabular-nums}
-#rows .r.warn span:last-child{color:#fbbf24}
-
-.ctl{margin-bottom:11px}
-.ctl label{display:flex;justify-content:space-between;font-weight:500;font-size:12px;color:#cbd5e1}
-.ctl label b{color:#38bdf8;font:700 12px 'JetBrains Mono',monospace}
-input[type=range]{width:100%;appearance:none;-webkit-appearance:none;background:rgba(51,65,85,.6);border-radius:6px;height:6px;margin:7px 0 0}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;height:16px;width:16px;border-radius:50%;background:#38bdf8;cursor:pointer;box-shadow:0 0 10px rgba(56,189,248,.5)}
-input[type=range]::-moz-range-thumb{height:16px;width:16px;border:0;border-radius:50%;background:#38bdf8;cursor:pointer}
-.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid rgba(100,116,139,.5);padding-top:12px;margin-top:6px}
-
-footer{display:flex;gap:12px;align-items:stretch}
-.chain{flex:1;display:flex;align-items:center;gap:10px;padding:10px 14px;flex-wrap:wrap;min-width:0}
-.chain>i{color:#38bdf8}
-.box{background:rgba(2,6,23,.55);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:6px 10px;min-width:120px}
-.box span{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#94a3b8}
-.box b{font-size:17px;color:#fcd34d}.box em{font-style:normal;font-size:10px;color:#94a3b8;margin-left:3px}
-.box.loss b{color:#fb923c}
-.chartbox{width:min(620px,48vw);height:150px;padding:6px}
-#chart{width:100%;height:100%;display:block}
-
-#modal{position:fixed;inset:0;z-index:50;background:rgba(2,6,23,.7);display:flex;justify-content:center;align-items:center;pointer-events:auto}
-.sheet{width:min(820px,92vw);max-height:88vh;overflow-y:auto;padding:20px 24px;position:relative}
-.sheet h2{margin:0 0 6px}.sheet ul{padding-left:18px;line-height:1.5;color:#cbd5e1}.sheet li{margin-bottom:6px}
-.sheet p{color:#cbd5e1}
-.sheet pre{font:11.5px/1.55 'JetBrains Mono',monospace;color:#bcd2e2;white-space:pre-wrap;background:rgba(2,6,23,.5);padding:10px;border-radius:10px}
-.close{position:absolute;right:16px;top:14px}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-thumb{background:rgba(56,189,248,.3);border-radius:3px}
-
-
-/* ============ RESPONSIVE LAYOUT ============ */
-
-/* Tablets and smaller laptops */
-@media (max-width: 1100px) and (min-width: 901px) {
+  * { box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; margin: 0; }
+  body {
+    overflow: hidden;
+    background: #020a18;
+    color: #f3f4f6;
+    font-family: Inter, system-ui, sans-serif;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #canvas-container { position: fixed; inset: 0; z-index: 0; }
+  #canvas-container canvas { display: block; width: 100%; height: 100%; touch-action: none; }
   #ui {
-    padding: 12px;
-  }
-
-  .side {
-    width: 290px;
-    padding: 12px;
-  }
-
-  .chartbox {
-    width: min(480px, 42vw);
-  }
-
-  .box {
-    min-width: 100px;
-  }
-
-  .chain {
-    gap: 7px;
-    padding: 8px;
-  }
-}
-
-/* Tablets and mobile phones */
-@media (max-width: 900px) {
-  html,
-  body {
-    height: auto;
-    min-height: 100%;
-  }
-
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  /* Keep the 3D simulation behind the entire scrolling page */
-  #canvas-container {
     position: fixed;
     inset: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    z-index: 0;
-  }
-
-  #canvas-container canvas {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Main interface */
-  #ui {
-    height: auto;
-    min-height: 100vh;
-    min-height: 100svh;
-    justify-content: flex-start;
-    gap: 12px;
-    padding:
-      max(12px, env(safe-area-inset-top, 0px))
-      12px
-      max(16px, env(safe-area-inset-bottom, 0px));
-  }
-
-  /* Header */
-  header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-  }
-
-  .brand {
-    width: 100%;
-    min-width: 0;
-    padding: 12px;
-  }
-
-  .brand h1 {
-    font-size: 15px;
-    line-height: 1.5;
-  }
-
-  .brand p {
-    font-size: 10px;
-    margin-top: 3px;
-  }
-
-  /* Camera buttons */
-  .camrow {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 7px;
-    padding: 8px;
-  }
-
-  .camrow .gbtn {
-    min-width: 0;
-    min-height: 40px;
-    padding: 9px 5px;
-    font-size: 11px;
-    white-space: nowrap;
-  }
-
-  /* Main panels */
-  #mid {
-    flex: none;
-    min-height: 0;
-    height: auto;
+    z-index: 5;
     display: flex;
     flex-direction: column;
-    align-items: stretch;
+    justify-content: space-between;
+    padding: max(16px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
     gap: 12px;
-    overflow: visible;
-    pointer-events: auto;
+    pointer-events: none;
   }
-
-  .side {
-    width: 100%;
-    max-height: none;
-    height: auto;
-    overflow: visible;
-    padding: 14px;
+  #ui > * { pointer-events: none; }
+  .glass, .glass * { pointer-events: auto; }
+  .glass {
+    background: rgba(9, 18, 35, .78);
+    border: 1px solid rgba(255,255,255,.13);
+    box-shadow: 0 14px 36px rgba(0,0,0,.34);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 15px;
   }
-
-  /* Telemetry cards */
-  .cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
   }
-
-  .card {
-    min-width: 0;
-    padding: 9px;
-  }
-
-  .card b {
-    font-size: 16px;
-  }
-
-  /* Telemetry rows */
-  #rows .r {
-    gap: 8px;
-    font-size: 11px;
-    padding: 5px 0;
-  }
-
-  #rows .r span:last-child {
-    text-align: right;
-  }
-
-  /* Physics controls */
-  .ctl {
-    margin-bottom: 15px;
-  }
-
-  .ctl label {
-    gap: 8px;
-    font-size: 11px;
-  }
-
-  .ctl label b {
-    white-space: nowrap;
-    font-size: 11px;
-  }
-
-  input[type=range] {
-    height: 7px;
-    margin-top: 10px;
-    touch-action: pan-y;
-  }
-
-  input[type=range]::-webkit-slider-thumb {
-    width: 20px;
-    height: 20px;
-  }
-
-  input[type=range]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-  }
-
-  /* Buttons */
-  .btns {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .gbtn {
-    min-height: 38px;
-  }
-
-  .gbtn.wide {
-    min-height: 42px;
-  }
-
-  #speed {
-    width: 100%;
-  }
-
-  /* Footer and energy-flow diagram */
-  footer {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .chain {
-    flex: none;
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 10px;
-  }
-
-  .chain > i {
-    display: none;
-  }
-
-  .box {
-    min-width: 0;
-    width: 100%;
-    padding: 9px;
-  }
-
-  .box span {
-    line-height: 1.4;
-    font-size: 9px;
-  }
-
-  .box b {
-    font-size: 16px;
-  }
-
-  .chartbox {
-    width: 100%;
-    height: 230px;
-    padding: 8px;
-  }
-
-  /* Assumptions modal */
-  #modal {
-    padding: 10px;
-  }
-
-  .sheet {
-    width: 100%;
-    max-width: 650px;
-    max-height: calc(100dvh - 20px);
-    padding: 18px;
-  }
-
-  .sheet h2 {
-    font-size: 19px;
-    padding-right: 55px;
-  }
-
-  .sheet p,
-  .sheet li {
-    font-size: 12px;
-  }
-
-  .sheet pre {
-    font-size: 10px;
-    overflow-wrap: anywhere;
-  }
-}
-
-/* Small phones */
-@media (max-width: 480px) {
-  #ui {
-    padding-left: 9px;
-    padding-right: 9px;
-    gap: 10px;
-  }
-
   .brand {
-    gap: 9px;
-    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 15px;
+    border-left: 4px solid #38bdf8;
+    min-width: 0;
   }
-
   .logo {
-    width: 33px;
-    height: 33px;
-    flex-shrink: 0;
-    font-size: 15px;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    display: grid;
+    place-items: center;
+    color: #38bdf8;
+    background: rgba(14,165,233,.17);
+    border-radius: 10px;
+    font-size: 18px;
   }
-
-  .brand h1 {
-    font-size: 13px;
-    gap: 5px;
-  }
-
-  .badge {
-    font-size: 8px;
-  }
-
-  .brand p {
-    font-size: 9px;
-  }
-
-  .side {
-    padding: 12px;
-    border-radius: 13px;
-  }
-
-  .title {
-    font-size: 11px;
-  }
-
-  .camrow .gbtn {
-    font-size: 10px;
-    gap: 4px;
-  }
-
-  .card b {
-    font-size: 15px;
-  }
-
-  .card span {
-    font-size: 9px;
-  }
-
-  .chain {
-    padding: 8px;
-    gap: 7px;
-  }
-
-  .box {
-    padding: 8px;
-  }
-
-  .box span {
-    font-size: 8px;
-  }
-
-  .box b {
-    font-size: 14px;
-  }
-
-  .chartbox {
-    height: 255px;
-  }
-
-  .sheet {
-    padding: 15px;
-  }
-
-  .close {
-    right: 10px;
-    top: 10px;
-  }
-}
-
-/* Extra-small phones */
-@media (max-width: 350px) {
+  .brand h1 { margin: 0; font-size: 15px; line-height: 1.35; font-weight: 700; }
+  .brand p { margin: 4px 0 0; color: #9aabc1; font-size: 10.5px; }
   .camrow {
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
     padding: 6px;
+    max-width: 600px;
+  }
+  .gbtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 10px;
+    background: rgba(30,41,59,.76);
+    color: #e2e8f0;
+    font: 600 11px Inter, sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .18s ease, border-color .18s ease, transform .18s ease;
+  }
+  .gbtn:hover { background: rgba(51,65,85,.94); border-color: rgba(56,189,248,.5); }
+  .gbtn:active { transform: scale(.98); }
+  .gbtn.active { color: #7dd3fc; border-color: #38bdf8; background: rgba(14,165,233,.2); }
+  footer { display: flex; justify-content: center; align-items: flex-end; gap: 8px; }
+  .toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; padding: 7px; }
+  .toolbar .gbtn { min-width: 94px; }
+  #speed { min-width: 112px; outline: none; }
+  #speed option { background: #0f172a; color: #f3f4f6; }
+  .hint {
+    align-self: flex-end;
+    color: rgba(226,232,240,.72);
+    background: rgba(2,6,23,.48);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 9px;
+    padding: 8px 11px;
+    font-size: 10px;
+    letter-spacing: .01em;
+    pointer-events: none;
   }
 
-  .camrow .gbtn {
-    font-size: 9px;
+  @media (max-width: 900px) {
+    #ui { padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+    header { flex-direction: column; align-items: stretch; gap: 8px; }
+    .brand { width: 100%; padding: 9px 11px; }
+    .brand h1 { font-size: 14px; }
+    .brand p { font-size: 9.5px; }
+    .logo { width: 34px; height: 34px; flex-basis: 34px; font-size: 16px; }
+    .camrow {
+      width: 100%;
+      max-width: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 6px;
+      padding: 6px;
+    }
+    .camrow .gbtn { min-width: 0; min-height: 36px; padding: 7px 4px; font-size: 10px; gap: 5px; }
+    footer { justify-content: center; }
+    .toolbar { justify-content: center; width: 100%; }
+    .toolbar .gbtn { flex: 1 1 0; min-width: 0; }
+    #speed { flex: 1.2 1 0; min-width: 0; }
+    .hint { display: none; }
   }
-
-  .card {
-    padding: 7px;
+  @media (max-width: 480px) {
+    .brand h1 { font-size: 13px; }
+    .camrow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .camrow .gbtn { font-size: 9.5px; }
+    .toolbar { gap: 5px; padding: 6px; }
+    .toolbar .gbtn { min-height: 40px; padding: 7px 5px; font-size: 10px; }
+    #speed { font-size: 10px; }
   }
-
-  .card b {
-    font-size: 13px;
+  @media (max-height: 520px) and (orientation: landscape) {
+    #ui { padding: 7px 9px; }
+    header { flex-direction: row; align-items: flex-start; }
+    .brand { padding: 7px 9px; }
+    .brand p { display: none; }
+    .logo { width: 30px; height: 30px; flex-basis: 30px; }
+    .camrow { display: flex; width: auto; max-width: 65%; }
+    .camrow .gbtn { min-height: 32px; padding: 5px 7px; }
+    .toolbar { padding: 5px; }
+    .toolbar .gbtn { min-height: 33px; }
   }
-
-  .chain {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .box span {
-    font-size: 7.5px;
-  }
-
-  .box b {
-    font-size: 13px;
-  }
-}
-
 </style>
 </head>
 <body>
@@ -487,501 +162,450 @@ footer{display:flex;gap:12px;align-items:stretch}
     <div class="glass brand">
       <div class="logo"><i class="fa-solid fa-bolt-lightning"></i></div>
       <div>
-        <h1>Wave Energy Converter <span class="badge">500 kW rated · mass-scaled dynamics</span></h1>
-        <p>Heaving buoy · rack &amp; pinion PTO · synchronous generator</p>
+        <h1>Wave Energy Converter</h1>
+        <p>Mechanical animation · heaving buoy · rack &amp; pinion drive</p>
       </div>
     </div>
-    <div class="glass camrow" id="camrow">
+
+    <nav class="glass camrow" id="camrow" aria-label="Camera views">
       <button class="gbtn active" data-cam="orbit"><i class="fa-solid fa-globe"></i> Orbit</button>
       <button class="gbtn" data-cam="pto"><i class="fa-solid fa-gear"></i> Dynamo station</button>
       <button class="gbtn" data-cam="buoy"><i class="fa-solid fa-water"></i> Buoy level</button>
       <button class="gbtn" data-cam="seabed"><i class="fa-solid fa-anchor"></i> Seabed</button>
       <button class="gbtn" data-cam="top"><i class="fa-solid fa-arrows-up-to-line"></i> Top-down</button>
-    </div>
+    </nav>
   </header>
 
-  <div id="mid">
-    <section class="glass side" id="left">
-      <div class="title"><span><i class="dot"></i> Live simulation</span><b id="sys-status">SYS_ACTIVE</b></div>
-      <div class="cards" id="cards"></div>
-      <h3>Detailed telemetry</h3>
-      <div id="rows"></div>
-      <p class="note">*Linear-theory cross-check. Effective hydrostatic area and PTO damping are mass-scaled to preserve comparable heave motion.</p>
-    </section>
-
-    <section class="glass side" id="right">
-      <div class="title"><span><i class="fa-solid fa-sliders"></i> Physics &amp; wave controls</span></div>
-      <div id="controls"></div>
-      <div class="btns">
-        <button class="gbtn" id="btn-pause">Pause</button>
-        <button class="gbtn" id="btn-reset">Reset</button>
-        <button class="gbtn" id="btn-wire"><i class="fa-solid fa-cubes"></i> Wireframe</button>
-        <select id="speed" class="gbtn">
-          <option value="1">Time ×1</option><option value="5">Time ×5</option>
-          <option value="20">Time ×20</option><option value="60">Time ×60</option>
-          <option value="300">Time ×300</option>
-        </select>
-      </div>
-      <button class="gbtn wide active" id="btn-rand"></button>
-      <button class="gbtn wide" id="btn-assume"><i class="fa-solid fa-book"></i> Assumptions &amp; equations</button>
-    </section>
-  </div>
-
   <footer>
-    <div class="glass chain" id="chain">
-      <div class="box"><span>Wave power over buoy width</span><b id="ch_w">0</b><em>kW</em></div>
-      <i class="fa-solid fa-arrow-right"></i>
-      <div class="box"><span>Absorbed by PTO (mech.)</span><b id="ch_m">0</b><em>kW</em></div>
-      <i class="fa-solid fa-arrow-right"></i>
-      <div class="box"><span>Electrical output</span><b id="ch_e">0</b><em>kW</em></div>
-      <div class="box loss"><span>Generator losses</span><b id="ch_l">0</b><em>kW</em></div>
+    <div class="glass toolbar">
+      <button class="gbtn" id="btn-pause"><i class="fa-solid fa-pause"></i> Pause</button>
+      <button class="gbtn" id="btn-reset"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+      <select class="gbtn" id="speed" aria-label="Animation speed">
+        <option value="0.55">Slow</option>
+        <option value="1" selected>Normal</option>
+        <option value="1.8">Fast</option>
+      </select>
     </div>
-    <div class="glass chartbox"><canvas id="chart"></canvas></div>
+    <div class="hint">Drag to orbit · scroll or pinch to zoom</div>
   </footer>
-</div>
-
-<div id="modal" class="hidden">
-  <div class="glass sheet">
-    <button class="gbtn close" id="btn-close">Close</button>
-    <h2>Assumptions &amp; equations</h2>
-    <h3>Neglected (as required)</h3>
-    <p>Friction of every kind, hydrodynamic drag, added mass, radiation damping, mooring forces and wave diffraction.</p>
-    <h3>Assumptions</h3>
-    <ul>
-      <li><b>Waves:</b> deep water; ρ<sub>sea</sub> = 1025 kg/m³, g = 9.81 m/s². <i>Regular</i> mode = one sinusoid. <i>Irregular</i> mode = three sinusoids (amplitudes 0.85a, 0.35a, 0.15a; frequencies ×1, ×1.5, ×2.33) like a swell spectrum. The buoy does not disturb the wave field.</li>
-      <li><b>Buoy (Body 1):</b> a ring-shaped float that slides on the fixed central shaft and moves only in heave. Default D = 20 m with a 1.5 m hole radius; moving assembly mass defaults to 500 kg (adjustable from 250 to 3,000 kg). To preserve a comparable heave response across this mass range, the model scales its <i>effective</i> waterplane area in proportion to mass. At D = 20 m, the equilibrium draft therefore remains about 0.95 m. This is a normalized engineering model: the drawn 20 m shell is not a literal displacement calculation for a 500 kg structure.</li>
-      <li><b>Fixed structure (Body 2):</b> a 48 m shaft on a seabed gravity anchor (32 m depth) carrying the dynamo station. It is rigid and does not move.</li>
-      <li><b>PTO:</b> a rack hanging from the top plate meshes with a pinion in the station (default r = 1.20 m), followed by a multi-stage gearbox (default N = 190:1). A mechanical motion rectifier makes the generator always turn the same way: ω<sub>g</sub> = N|v|/r.</li>
-      <li><b>PTO force:</b> linear damping F = c·v. The damping slider sets a reference coefficient c<sub>ref</sub>; the applied coefficient is c = c<sub>ref</sub> × (m / 300,000 kg), so PTO damping scales with moving mass along with the effective waterplane area. The displayed slider value is the resulting effective coefficient. When P<sub>el</sub> would exceed the rated capacity, the force is reduced so it never does.</li>
-      <li><b>Generator (assumed Stamford-type brushless synchronous):</b> 4 poles, rated 500 kW at 1500 rpm, 690 V line-to-line, power factor 0.9, constant excitation (voltage ∝ speed), efficiency 92 % constant. Readings are generator-side AC with variable frequency; the grid converter is not modelled.</li>
-      <li>Rotor and gearbox inertia are ignored: generator speed follows the buoy velocity instantly.</li>
-      <li>Visual only: rotor animation is slowed ×20; gear teeth are not to scale.</li>
-      <li>Results are predictions under idealised assumptions, not guaranteed real-ocean performance. The 500 kW generator rating is a ceiling, not a continuous output; with a 250–3,000 kg moving mass, predicted output will generally be far below that ceiling.</li>
-    </ul>
-    <h3>Equations</h3>
-    <pre>
-η(t)      = Σ a_i cos(ω_i t + δ_i)           ω = 2π/T
-S_eff     = S_geom · (m / M_ref)              M_ref = 300,000 kg
-d0        = m / (ρ S_eff)
-F_buoy    = ρ g S_eff · sub − m g             sub = clamp(d0 + η − z, 0, H_b)
-Newton    : m z'' = F_buoy − F_PTO
-c         = c_ref · (m / M_ref)
-F_PTO     = sign(v)·min(c|v|, P_lim/|v|)      P_lim = P_rated / η_gen
-P_mech    = |F_PTO| · |v|
-ω_g       = N|v|/r        τ_g = |F_PTO| · r / N     (P_mech = τ_g ω_g)
-P_el      = η_gen · P_mech
-n = 60 ω_g/2π,  f = p n/120,  V = 690 · n/1500,  I = P_el/(√3 V pf)
-P_wave    = Σ ρ g² a_i² T_i /(8π)   per metre of crest
-Linear check: A_i = a_i k /√((k − mω_i²)² + (cω_i)²),  P = η·Σ ½ c ω_i² A_i²   (k = ρ g S_eff)
-    </pre>
-  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
-  (function () {
-'use strict';
+(() => {
+  'use strict';
 
-/* ============ CONSTANTS & ASSUMPTIONS ============ */
-const G = 9.81, RHO = 1025;
-const POLES = 4, V_RATED = 690, N_RATED = 1500, PF = 0.9;   // generator
-const DT = 0.005;                                           // physics step (s)
-const MASS_REFERENCE = 300000;                               // kg: original reference assembly mass
-const RI = 1.5;                       // buoy hole radius around the shaft (m)
-const BED = -32, ST_Y = 11;           // seabed depth, dynamo-station height (m)
-const HP = 26, RACK_L = 34, RX = 1.0; // pillar height, rack length, rack offset from shaft axis (m)
-const STROKE = 8;                     // mechanical stroke limit shown as warning (m)
-const $ = id => document.getElementById(id);
+  /*
+    This is a visual, procedural animation only.
+    It does not calculate forces, power, energy, voltage, current, or performance.
+  */
 
-/* ============ PARAMETERS ============ */
-const P = { a: 1.2, T: 8, D: 20, m: 500, c: 600, N: 190, r: 1.2, eta: 0.92, Prated: 500, rand: true };
-const CONTROLS = [
-  ['a',     'Wave amplitude a',       'm',      0.35, 4,       0.01],
-  ['T',     'Wave period T',          's',      3.5,   14,      0.1],
-  ['D',     'Buoy diameter D',        'm',      8,  26,      1],
-  ['m',     'Moving mass m',          'kg',     250,  3000,     50],
-  ['c',     'PTO damping c (effective)', 'kN·s/m', 100, 4000,    50],
-  ['N',     'Gear ratio N',           ':1',     20,  300,     5],
-  ['r',     'Pinion radius r',        'm',      0.3, 1.5,     0.05],
-  ['eta',   'Generator efficiency η', '',       0.7, 0.98,    0.01],
-  ['Prated','Generator capacity',     'kW',     100, 1000,    10]
-];
-const CARDS = [['Pel','Power output','kW','amber'], ['V','Voltage (LL)','V','sky'], ['I','Current','A','indigo'],
-               ['rpm','Generator RPM','rpm','emerald'], ['E','Energy yield','kWh','emerald'], ['u','Vert. velocity','m/s','slate']];
-const ROWS = [['eta','Wave elevation η','m'], ['z','Buoy heave z','m'], ['sub','Submerged depth','m'],
-  ['Fp','PTO force','kN'], ['Pm','Mechanical power','kW'], ['tau','Generator torque','kN·m'], ['f','Electrical frequency','Hz'],
-  ['Pavg','Avg. electrical power','kW'], ['Pth','Linear-theory avg.*','kW'], ['Pw','Wave power / metre','kW/m'],
-  ['cwr','Capture width ratio','%'], ['lim','Rated-power limiter',''], ['flag','Buoy status',''], ['t','Simulated time','s']];
+  const $ = id => document.getElementById(id);
+  const BED = -32;
+  const STATION_Y = 11;
+  const SHAFT_TOP = 16;
+  const HP = 26;
+  const BUOY_HEIGHT = 4;
+  const BUOY_RADIUS = 10;
+  const HOLE_RADIUS = 1.5;
+  const PINION_RADIUS = 1.2;
+  const GEAR_RATIO_VISUAL = 24;
+  const BASE_DRAFT = 0.95;
 
-/* ============ WAVES & GEOMETRY ============ */
-let W = [], g0;
-function updateWaves() {
-  W = P.rand
-    ? [{ a: .85 * P.a, m: 1,    d: 0,   th: 0   },
-       { a: .35 * P.a, m: 1.5,  d: 1.4, th: .4  },
-       { a: .15 * P.a, m: 2.33, d: 2.8, th: -.7 }]
-    : [{ a: P.a, m: 1, d: 0, th: 0 }];
-}
-function geo() {
-  // Similarity scaling: keep the heave response comparable as moving mass changes.
-  // Both effective waterplane area and PTO damping scale in proportion to mass.
-  const Sgeom = Math.PI * (P.D * P.D / 4 - RI * RI);
-  const massScale = P.m / MASS_REFERENCE;
-  const S = Sgeom * massScale;
-  const d0 = P.m / (RHO * S);
-  return { S, Sgeom, d0, Hb: Math.max(4, 2 * d0), k: RHO * G * S, w: 2 * Math.PI / P.T };
-}
-function ptoDamping() {
-  return P.c * 1e3 * (P.m / MASS_REFERENCE);
-}
-function etaOf(ph) { let s = 0; for (let i = 0; i < W.length; i++) s += W[i].a * Math.cos(W[i].m * ph + W[i].d); return s; }
+  let scene, camera, renderer, orbit;
+  let oceanGeo, oceanMesh, moving, station;
+  let pinion, rotor;
+  let running = true;
+  let animationSpeed = 1;
+  let elapsed = 0;
+  let generatorAngle = 0;
+  let previousFrame = performance.now();
+  let lastHeave = 0;
+  let wireframe = false;
+  const materials = {};
 
-/* ============ STATE & PHYSICS ============ */
-let S; const hist = { z: [], e: [], p: [] }; let lastRec = 0; const HN = 600;
-function resetState() {
-  S = { z: 0, u: 0, ph: 0, t: 0, Em: 0, Eel: 0, Fp: 0, Pm: 0, Pel: 0, Pms: 0, Pels: 0, thP: 0, thG: 0, sub: 0, eta: 0, flag: 'floating', lim: false };
-  hist.z = []; hist.e = []; hist.p = []; lastRec = 0;
-}
-function ptoForce(u) {
-  const au = Math.abs(u), Plim = P.Prated * 1e3 / P.eta;
-  return Math.sign(u) * Math.min(ptoDamping() * au, Plim / (au + 1e-9));
-}
-function deriv(y) {                                  // y = [z, v, phase]
-  const eta = etaOf(y[2]);
-  const sub = Math.min(g0.Hb, Math.max(0, g0.d0 + eta - y[0]));
-  const Fb = RHO * G * g0.S * sub - P.m * G;         // buoyancy minus weight
-  return [y[1], (Fb - ptoForce(y[1])) / P.m, g0.w];  // Newton: m z'' = Fb − F_PTO
-}
-function step() {
-  const y = [S.z, S.u, S.ph], add = (a, k, h) => a.map((v, i) => v + k[i] * h);
-  const k1 = deriv(y), k2 = deriv(add(y, k1, DT / 2)), k3 = deriv(add(y, k2, DT / 2)), k4 = deriv(add(y, k3, DT));
-  S.z += DT / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0]);
-  S.u += DT / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1]);
-  S.ph += DT * g0.w;
-  const au = Math.abs(S.u);
-  S.eta = etaOf(S.ph);
-  S.sub = g0.d0 + S.eta - S.z;
-  S.flag = Math.abs(S.z) > STROKE ? 'STROKE LIMIT' : S.sub <= 0 ? 'OUT OF WATER' : S.sub >= g0.Hb ? 'FULLY SUBMERGED' : 'floating';
-  S.Fp = ptoForce(S.u);
-  S.lim = ptoDamping() * au > P.Prated * 1e3 / P.eta / (au + 1e-9);
-  S.Pm = Math.abs(S.Fp) * au;                                   // P_mech = F·v
-  S.Pel = P.eta * S.Pm;                               // P_el = η·P_mech
-  S.Pms += (S.Pm - S.Pms) * DT / 5; S.Pels += (S.Pel - S.Pels) * DT / 5;
-  S.thP -= S.u / P.r * DT;                            // pinion angle (reverses)
-  S.thG += P.N * au / P.r * DT;                       // generator angle (rectified)
-  S.Em += S.Pm * DT; S.Eel += S.Pel * DT; S.t += DT;
-  if (S.t - lastRec >= 0.1) {
-    lastRec = S.t; hist.z.push(S.z); hist.e.push(S.eta); hist.p.push(S.Pel / 1e3);
-    if (hist.z.length > HN) for (const k in hist) hist[k].shift();
+  const CAMERAS = {
+    orbit:   { position: [-45, 24, 62], target: [0, 4, 0] },
+    pto:     { position: [9, 14, 16], target: [0.5, 11, 0.5] },
+    buoy:    { position: [-30, 5, 32], target: [0, 0, 0] },
+    seabed:  { position: [-34, -22, 38], target: [0, -20, 0] },
+    top:     { position: [0, 75, 0.1], target: [0, 8, 0] }
+  };
+
+  function material(color, options = {}) {
+    return new THREE.MeshStandardMaterial({ color, ...options });
   }
-}
-function derived() {
-  const au = Math.abs(S.u), n = P.N * au / P.r * 60 / (2 * Math.PI), V = V_RATED * n / N_RATED;
-  let Pth = 0, Pw = 0;
-  W.forEach(c => {
-    const w = c.m * g0.w, cEff = ptoDamping();
-    const A = c.a * g0.k / Math.hypot(g0.k - P.m * w * w, cEff * w);
-    Pth += P.eta * 0.5 * cEff * w * w * A * A;
-    Pw += RHO * G * G * c.a * c.a * (P.T / c.m) / (8 * Math.PI);
-  });
-  return { n, V, f: POLES * n / 120, tau: Math.abs(S.Fp) * P.r / P.N,
-    I: V > 5 ? S.Pel / (Math.sqrt(3) * V * PF) : 0, Pth, Pw,
-    Pavg: S.t > 0 ? S.Eel / S.t : 0, cwr: 100 * S.Pms / (Pw * P.D) };
-}
 
-/* ============ UI ============ */
-function buildUI() {
-  const refreshers = [];
-  CONTROLS.forEach(([k, label, unit, min, max, st]) => {
-    const d = document.createElement('div'); d.className = 'ctl';
-    d.innerHTML = `<label>${label}<b></b></label><input type="range" min="${min}" max="${max}" step="${st}" value="${P[k]}">`;
-    $('controls').appendChild(d);
-    const inp = d.querySelector('input'), out = d.querySelector('b');
-    const show = () => {
-      if (k === 'm') out.textContent = P.m.toFixed(0) + ' kg';
-      else if (k === 'c') out.textContent = (P.c * P.m / MASS_REFERENCE).toFixed(2) + ' kN·s/m';
-      else out.textContent = (+P[k]).toFixed(st < 0.1 ? 2 : st < 1 ? 1 : 0) + (unit ? ' ' + unit : '');
-    };
-    refreshers.push(show);
-    inp.addEventListener('input', () => {
-      P[k] = parseFloat(inp.value); refreshers.forEach(refresh => refresh()); updateWaves(); g0 = geo();
-      if (k === 'D' || k === 'm') buildMoving();
-      if (k === 'r') buildPinion();
+  function makeMesh(geometry, mat, position, parent, castShadow = true) {
+    const mesh = new THREE.Mesh(geometry, mat);
+    mesh.position.set(position[0], position[1], position[2]);
+    mesh.castShadow = castShadow;
+    if (parent) parent.add(mesh);
+    return mesh;
+  }
+
+  function initMaterials() {
+    Object.assign(materials, {
+      rubber: material(0x0f172a, { roughness: 0.62, side: THREE.DoubleSide }),
+      yellow: material(0xfacc15, { roughness: 0.4, metalness: 0.2 }),
+      chrome: material(0xe2e8f0, { metalness: 0.9, roughness: 0.16 }),
+      white: material(0xf8fafc, { roughness: 0.3, metalness: 0.1 }),
+      orange: material(0xf97316, { roughness: 0.35, metalness: 0.15 }),
+      steel: material(0x64748b, { metalness: 0.8, roughness: 0.22 }),
+      dark: material(0x1e293b, { roughness: 0.5 }),
+      sleeve: material(0x1e293b, { transparent: true, opacity: 0.5, roughness: 0.5 }),
+      concrete: material(0x334155, { roughness: 0.85 }),
+      shell: material(0x4a7fa8, { transparent: true, opacity: 0.42, roughness: 0.3 }),
+      tube: material(0xf8fafc, { transparent: true, opacity: 0.24, roughness: 0.3, side: THREE.DoubleSide }),
+      seabed: material(0xc2b280, { roughness: 0.95 }),
+      rock: material(0x4a5568, { roughness: 0.85 })
     });
-    show();
-  });
-  $('cards').innerHTML = CARDS.map(([k, l, u, c]) => `<div class="card ${c}"><span>${l}</span><div><b id="c_${k}">0</b><em>${u}</em></div></div>`).join('');
-  $('rows').innerHTML = ROWS.map(([k, l, u]) => `<div class="r" id="rw_${k}"><span>${l}</span><span><span id="r_${k}">–</span> ${u}</span></div>`).join('');
-  $('btn-pause').onclick = () => { running = !running; $('btn-pause').textContent = running ? 'Pause' : 'Resume';
-    $('sys-status').textContent = running ? 'SYS_ACTIVE' : 'SYS_PAUSED'; };
-  $('btn-reset').onclick = resetState;
-  $('speed').onchange = e => speed = parseFloat(e.target.value);
-  $('btn-wire').onclick = e => { const w = !mats.rubber.wireframe; e.currentTarget.classList.toggle('active', w);
-    scene.traverse(o => { if (o.isMesh) (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => m.wireframe = w); }); wire = w; };
-  const rb = () => { $('btn-rand').innerHTML = P.rand ? '<i class="fa-solid fa-wind"></i> Irregular swell spectrum: ON' : '<i class="fa-solid fa-water"></i> Regular sine wave: ON';
-    $('btn-rand').classList.toggle('active', P.rand); };
-  $('btn-rand').onclick = () => { P.rand = !P.rand; updateWaves(); rb(); }; rb();
-  $('btn-assume').onclick = () => $('modal').classList.remove('hidden');
-  $('btn-close').onclick = () => $('modal').classList.add('hidden');
-  document.querySelectorAll('[data-cam]').forEach(b => b.onclick = () => setCam(b.dataset.cam, b));
-}
-let lastUI = 0;
-function updateUI(now) {
-  if (now - lastUI < 150) return; lastUI = now;
-  const d = derived(), set = (id, v) => $(id).textContent = v;
-  set('c_Pel', (S.Pel / 1e3).toFixed(1)); set('c_V', d.V.toFixed(0)); set('c_I', d.I.toFixed(0));
-  set('c_rpm', d.n.toFixed(0)); set('c_E', (S.Eel / 3.6e6).toFixed(3)); set('c_u', S.u.toFixed(2));
-  const rv = { eta: S.eta.toFixed(2), z: S.z.toFixed(2), sub: S.sub.toFixed(2), Fp: (S.Fp / 1e3).toFixed(0), Pm: (S.Pm / 1e3).toFixed(1),
-    tau: (d.tau / 1e3).toFixed(2), f: d.f.toFixed(1), Pavg: (d.Pavg / 1e3).toFixed(1), Pth: (d.Pth / 1e3).toFixed(1),
-    Pw: (d.Pw / 1e3).toFixed(1), cwr: d.cwr.toFixed(1), lim: S.lim ? 'ACTIVE' : 'off', flag: S.flag, t: S.t.toFixed(1) };
-  for (const k in rv) set('r_' + k, rv[k]);
-  $('rw_lim').classList.toggle('warn', S.lim); $('rw_flag').classList.toggle('warn', S.flag !== 'floating');
-  set('ch_w', (d.Pw * P.D / 1e3).toFixed(0)); set('ch_m', (S.Pms / 1e3).toFixed(0));
-  set('ch_e', (S.Pels / 1e3).toFixed(0)); set('ch_l', ((S.Pms - S.Pels) / 1e3).toFixed(0));
-}
-
-/* ============ CHARTS ============ */
-const chart = $('chart'), cx = chart.getContext('2d');
-function plot(x, y, w, h, series, lo, hi, title, ref) {
-  cx.save(); cx.translate(x, y);
-  cx.strokeStyle = 'rgba(100,116,139,.5)'; cx.lineWidth = 1; cx.strokeRect(0, 0, w, h);
-  const Y = v => h - (v - lo) / (hi - lo) * h;
-  cx.fillStyle = '#94a3b8'; cx.font = '10px Inter,sans-serif'; cx.fillText(title, 6, 12);
-  cx.fillText(hi.toFixed(1), w - 30, 11); cx.fillText(lo.toFixed(1), w - 30, h - 4);
-  if (lo < 0 && hi > 0) { cx.beginPath(); cx.moveTo(0, Y(0)); cx.lineTo(w, Y(0)); cx.strokeStyle = 'rgba(100,116,139,.3)'; cx.stroke(); }
-  if (ref !== undefined) { cx.setLineDash([4, 4]); cx.beginPath(); cx.moveTo(0, Y(ref)); cx.lineTo(w, Y(ref)); cx.strokeStyle = '#f59e0b'; cx.stroke(); cx.setLineDash([]); }
-  series.forEach(([data, col]) => { cx.beginPath(); cx.strokeStyle = col; cx.lineWidth = 1.5;
-    data.forEach((v, i) => { const px = i / (HN - 1) * w; i ? cx.lineTo(px, Y(v)) : cx.moveTo(px, Y(v)); }); cx.stroke(); });
-  cx.restore();
-}
-
-function drawCharts() {
-  const dpr = window.devicePixelRatio || 1;
-  const Wd = chart.clientWidth;
-  const H = chart.clientHeight;
-
-  const targetWidth = Math.round(Wd * dpr);
-  const targetHeight = Math.round(H * dpr);
-
-  if (chart.width !== targetWidth || chart.height !== targetHeight) {
-    chart.width = targetWidth;
-    chart.height = targetHeight;
   }
 
-  cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  cx.clearRect(0, 0, Wd, H);
+  function initScene() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x020a18);
+    scene.fog = new THREE.FogExp2(0x020a18, 0.011);
 
-  const gap = 5;
-  const zr = Math.max(2, P.a * 1.6);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(...CAMERAS.orbit.position);
 
-  if (Wd < 520) {
-    // Mobile: graphs stacked vertically
-    const plotW = Wd - 2 * gap;
-    const plotH = (H - 3 * gap) / 2;
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.1;
+    $('canvas-container').appendChild(renderer.domElement);
 
-    // Wave elevation and buoy movement
-    plot(
-      gap,
-      gap,
-      plotW,
-      plotH,
-      [[hist.e, '#38bdf8'], [hist.z, '#f59e0b']],
-      -zr,
-      zr,
-      'Wave η (blue) · buoy z (orange) [m]'
+    orbit = new THREE.OrbitControls(camera, renderer.domElement);
+    orbit.enableDamping = true;
+    orbit.dampingFactor = 0.06;
+    orbit.target.set(...CAMERAS.orbit.target);
+    orbit.maxPolarAngle = Math.PI / 2 + 0.1;
+    orbit.minDistance = 5;
+    orbit.maxDistance = 170;
+
+    const sun = new THREE.DirectionalLight(0xfff5ea, 2.25);
+    sun.position.set(45, 70, 30);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(1536, 1536);
+    Object.assign(sun.shadow.camera, { near: 0.5, far: 160, left: -45, right: 45, top: 45, bottom: -45 });
+    scene.add(sun, new THREE.AmbientLight(0x1e3a8a, 1.35));
+
+    const fill = new THREE.DirectionalLight(0x06b6d4, 0.8);
+    fill.position.set(-15, -30, -15);
+    scene.add(fill);
+
+    initMaterials();
+    buildSeabed();
+    buildOcean();
+    buildFixedStructure();
+    moving = new THREE.Group();
+    scene.add(moving);
+    buildMovingStructure();
+    buildDynamoStation();
+
+    window.addEventListener('resize', onResize);
+  }
+
+  function buildSeabed() {
+    const geometry = new THREE.PlaneGeometry(200, 200, 50, 50);
+    const positions = geometry.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i);
+      const z = positions.getY(i);
+      positions.setZ(i, Math.sin(x * 0.15) * Math.cos(z * 0.15) * 1.5 + Math.sin(x * 0.04) * 2.5);
+    }
+    geometry.computeVertexNormals();
+    const bed = new THREE.Mesh(geometry, materials.seabed);
+    bed.rotation.x = -Math.PI / 2;
+    bed.position.y = BED;
+    bed.receiveShadow = true;
+    scene.add(bed);
+
+    const rockGeometry = new THREE.DodecahedronGeometry(1, 1);
+    for (let i = 0; i < 34; i++) {
+      const x = (Math.random() - 0.5) * 140;
+      const z = (Math.random() - 0.5) * 140;
+      if (Math.hypot(x, z) < 14) continue;
+      const size = 1 + Math.random() * 4;
+      const rock = makeMesh(rockGeometry, materials.rock, [x, BED + size * 0.4, z], scene);
+      rock.scale.set(size, size * (0.5 + Math.random() * 0.8), size);
+      rock.rotation.set(Math.random() * 3, Math.random() * 3, 0);
+      rock.castShadow = false;
+    }
+  }
+
+  function buildOcean() {
+    oceanGeo = new THREE.PlaneGeometry(160, 160, 90, 90);
+    const waterMaterial = new THREE.MeshPhysicalMaterial({
+      color: 0x006699,
+      emissive: 0x001122,
+      roughness: 0.12,
+      metalness: 0.08,
+      transparent: true,
+      opacity: 0.58,
+      side: THREE.DoubleSide,
+      depthWrite: false
+    });
+    oceanMesh = new THREE.Mesh(oceanGeo, waterMaterial);
+    oceanMesh.rotation.x = -Math.PI / 2;
+    scene.add(oceanMesh);
+  }
+
+  function buildFixedStructure() {
+    const fixed = new THREE.Group();
+    scene.add(fixed);
+
+    makeMesh(new THREE.BoxGeometry(16, 3.2, 16), materials.concrete, [0, BED + 1.6, 0], fixed);
+    makeMesh(new THREE.CylinderGeometry(9, 10, 1.2, 32), materials.concrete, [0, BED + 3.8, 0], fixed);
+
+    const top = STATION_Y + 5;
+    const shaftHeight = top - BED - 3.8;
+    makeMesh(
+      new THREE.CylinderGeometry(0.7, 0.7, shaftHeight, 32),
+      materials.chrome,
+      [0, BED + 3.8 + shaftHeight / 2, 0],
+      fixed
     );
 
-    // Electrical power
-    plot(
-      gap,
-      2 * gap + plotH,
-      plotW,
-      plotH,
-      [[hist.p, '#34d399']],
-      0,
-      Math.max(P.Prated, ...hist.p, 1) * 1.05,
-      'Electrical power [kW] – dashed = rated',
-      P.Prated
+    const cable = makeMesh(
+      new THREE.CylinderGeometry(0.25, 0.25, 60, 8),
+      materials.dark,
+      [35, BED + 1.2, 0],
+      fixed,
+      false
     );
-
-  } else {
-    // Desktop and tablets: graphs side by side
-    const w = (Wd - 3 * gap) / 2;
-    const h = H - 2 * gap;
-
-    plot(
-      gap,
-      gap,
-      w,
-      h,
-      [[hist.e, '#38bdf8'], [hist.z, '#f59e0b']],
-      -zr,
-      zr,
-      'Wave η (blue) · buoy z (orange) [m]'
-    );
-
-    plot(
-      2 * gap + w,
-      gap,
-      w,
-      h,
-      [[hist.p, '#34d399']],
-      0,
-      Math.max(P.Prated, ...hist.p, 1) * 1.05,
-      'Electrical power [kW] – dashed = rated',
-      P.Prated
-    );
-  }
-}
-
-
-/* ============ THREE.JS SCENE ============ */
-let scene, camera, renderer, controls, oceanMesh, oceanGeo, waterMat, moving, st, pinion, pod, rotor, wire = false;
-let running = true, speed = 1, prev = performance.now();
-const mats = {};
-const CAMS = {
-  orbit:  [[-45, 24, 62], [0, 4, 0]],
-  pto:    [[9, 14, 16],   [0.5, 11, 0.5]],
-  buoy:   [[-30, 5, 32],  [0, 0, 0]],
-  seabed: [[-34, -22, 38],[0, -20, 0]],
-  top:    [[0, 75, 0.1],  [0, 8, 0]]
-};
-function initScene() {
-  scene = new THREE.Scene(); scene.background = new THREE.Color(0x020a18); scene.fog = new THREE.FogExp2(0x020a18, 0.011);
-  camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 0.1, 1000); camera.position.set(...CAMS.orbit[0]);
-  renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2)); renderer.setSize(innerWidth, innerHeight);
-  renderer.shadowMap.enabled = true; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.1;
-  $('canvas-container').appendChild(renderer.domElement);
-  controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true; controls.target.set(...CAMS.orbit[1]); controls.maxPolarAngle = Math.PI / 2 + 0.1; controls.minDistance = 5; controls.maxDistance = 170;
-
-  const sun = new THREE.DirectionalLight(0xfff5ea, 2.4); sun.position.set(45, 70, 30); sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048); Object.assign(sun.shadow.camera, { near: .5, far: 160, left: -45, right: 45, top: 45, bottom: -45 });
-  scene.add(sun, new THREE.AmbientLight(0x1e3a8a, 1.4));
-  const fill = new THREE.DirectionalLight(0x06b6d4, .9); fill.position.set(-15, -30, -15); scene.add(fill);
-
-  const std = (c, o) => new THREE.MeshStandardMaterial(Object.assign({ color: c }, o));
-  Object.assign(mats, {
-    rubber: std(0x0f172a, { roughness: .6, side: THREE.DoubleSide }), yellow: std(0xfacc15, { roughness: .4, metalness: .2 }),
-    chrome: std(0xe2e8f0, { metalness: .9, roughness: .15 }), white: std(0xf8fafc, { roughness: .3, metalness: .1 }),
-    orange: std(0xf97316, { roughness: .3, metalness: .1 }), steel: std(0x64748b, { metalness: .8, roughness: .2 }),
-    dark: std(0x1e293b, { roughness: .5 }), sleeve: std(0x1e293b, { transparent: true, opacity: .5, roughness: .5 }), concrete: std(0x334155, { roughness: .8 }),
-    shell: std(0x4a7fa8, { transparent: true, opacity: .4, roughness: .3 }),
-    tube: std(0xf8fafc, { transparent: true, opacity: .32, roughness: .3, side: THREE.DoubleSide })
-  });
-
-  // seabed + rocks
-  const bg = new THREE.PlaneGeometry(200, 200, 50, 50), bp = bg.attributes.position;
-  for (let i = 0; i < bp.count; i++) { const x = bp.getX(i), y = bp.getY(i); bp.setZ(i, Math.sin(x * .15) * Math.cos(y * .15) * 1.5 + Math.sin(x * .04) * 2.5); }
-  bg.computeVertexNormals();
-  const bed = new THREE.Mesh(bg, std(0xc2b280, { roughness: .9 })); bed.rotation.x = -Math.PI / 2; bed.position.y = BED; bed.receiveShadow = true; scene.add(bed);
-  const rg = new THREE.DodecahedronGeometry(1, 1), rm = std(0x4a5568, { roughness: .8 });
-  for (let i = 0; i < 34; i++) {
-    const rx = (Math.random() - .5) * 140, rz = (Math.random() - .5) * 140; if (Math.hypot(rx, rz) < 14) continue;
-    const s = 1 + Math.random() * 4, rock = new THREE.Mesh(rg, rm); rock.scale.set(s, s * (.5 + Math.random() * .8), s);
-    rock.position.set(rx, BED + s * .4, rz); rock.rotation.set(Math.random() * 3, Math.random() * 3, 0); scene.add(rock);
+    cable.rotation.z = Math.PI / 2;
   }
 
-  // ocean
-  oceanGeo = new THREE.PlaneGeometry(160, 160, 90, 90);
-  waterMat = new THREE.MeshPhysicalMaterial({ color: 0x006699, emissive: 0x001122, roughness: .1, metalness: .1, transparent: true, opacity: .55, side: THREE.DoubleSide, depthWrite: false });
-  oceanMesh = new THREE.Mesh(oceanGeo, waterMat); oceanMesh.rotation.x = -Math.PI / 2; scene.add(oceanMesh);
+  function buildDynamoStation() {
+    station = new THREE.Group();
+    station.position.set(0, STATION_Y, 0);
+    scene.add(station);
 
-  buildFixed(); moving = new THREE.Group(); scene.add(moving); buildMoving(); buildPinion();
-  addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
-}
+    const pinionX = 2.55;
+    const stationRadius = pinionX + PINION_RADIUS + 0.6;
 
-/* ----- fixed body: anchor, shaft, dynamo station ----- */
-function buildFixed() {
-  const fx = new THREE.Group(); scene.add(fx);
-  const add = (geo, mat, x, y, z, cast) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = !!cast; fx.add(m); return m; };
-  add(new THREE.BoxGeometry(16, 3.2, 16), mats.concrete, 0, BED + 1.6, 0, true);
-  add(new THREE.CylinderGeometry(9, 10, 1.2, 32), mats.concrete, 0, BED + 3.8, 0);
-  const top = ST_Y + 5, h = top - BED - 3.8;
-  add(new THREE.CylinderGeometry(.7, .7, h, 32), mats.chrome, 0, BED + 3.8 + h / 2, 0, true);
-  // export cable lying on the seabed (as in the reference)
-  const run = add(new THREE.CylinderGeometry(.25, .25, 60, 8), mats.dark, 35, BED + 1.2, 0, false); run.rotation.z = Math.PI / 2;
-  st = new THREE.Group(); st.position.set(0, ST_Y, 0); fx.add(st);
-}
-/* ----- dynamo station: rebuilt when the pinion radius changes ----- */
-function buildPinion() {
-  while (st.children.length) st.remove(st.children[0]);
-  const put = (geo, mat, x, y, z, parent) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); (parent || st).add(m); return m; };
-  const px = RX + .4 + P.r - .05, TR = px + P.r + .6;          // pinion centre x, station radius
-  put(new THREE.CylinderGeometry(TR, TR, 7.5, 40), mats.tube, 0, 0, 0);
-  [-3.2, 3.2].forEach(y => { const r = put(new THREE.TorusGeometry(TR + .05, .18, 12, 40), mats.yellow, 0, y, 0); r.rotation.x = Math.PI / 2; });
-  put(new THREE.CylinderGeometry(1.5, 1.5, 7.6, 24), mats.sleeve, 0, 0, 0);   // dark guide tunnel around shaft + rack
-  // pinion
-  pinion = new THREE.Group(); pinion.position.set(px, 0, 0); st.add(pinion);
-  const d = new THREE.Mesh(new THREE.CylinderGeometry(P.r * .88, P.r * .88, .8, 32), mats.steel); d.rotation.x = Math.PI / 2; pinion.add(d);
-  const nt = Math.max(10, Math.round(P.r * 14)), tg = new THREE.BoxGeometry(.26, Math.max(.12, P.r * .32), .8);
-  for (let i = 0; i < nt; i++) { const a = i / nt * 2 * Math.PI, t = new THREE.Mesh(tg, mats.steel); t.position.set(Math.cos(a) * P.r * .94, Math.sin(a) * P.r * .94, 0); t.rotation.z = a; pinion.add(t); }
-  // gearbox + generator directly behind the pinion, inside the station
-  pod = new THREE.Group(); pod.position.set(px, 0, 0); st.add(pod);
-  const ax = put(new THREE.CylinderGeometry(.14, .14, 1.4, 12), mats.steel, 0, 0, .7, pod); ax.rotation.x = Math.PI / 2;
-  put(new THREE.BoxGeometry(1.7, 1.7, .9), mats.dark, 0, 0, 1.45, pod);
-  const gs = put(new THREE.CylinderGeometry(.95, .95, 1.5, 28), mats.shell, 0, 0, 2.65, pod); gs.rotation.x = Math.PI / 2;
-  [-.6, 0, .6].forEach(z => put(new THREE.TorusGeometry(.97, .06, 8, 28), mats.steel, 0, 0, 2.65 + z, pod));
-  rotor = new THREE.Group(); rotor.position.set(0, 0, 2.65); pod.add(rotor);
-  const rc = put(new THREE.CylinderGeometry(.42, .42, 1.4, 20), mats.chrome, 0, 0, 0, rotor); rc.rotation.x = Math.PI / 2;
-  for (let i = 0; i < POLES; i++) {                              // rotor poles (N/S alternate)
-    const a = i / POLES * 2 * Math.PI, pm = new THREE.MeshStandardMaterial({ color: i % 2 ? 0x3b82f6 : 0xef4444 });
-    const p = put(new THREE.BoxGeometry(.3, .4, 1.3), pm, Math.cos(a) * .6, Math.sin(a) * .6, 0, rotor); p.rotation.z = a;
+    makeMesh(new THREE.CylinderGeometry(stationRadius, stationRadius, 7.5, 40), materials.tube, [0, 0, 0], station);
+    [-3.2, 3.2].forEach(y => {
+      const rim = makeMesh(new THREE.TorusGeometry(stationRadius + 0.05, 0.18, 12, 40), materials.yellow, [0, y, 0], station);
+      rim.rotation.x = Math.PI / 2;
+    });
+    makeMesh(new THREE.CylinderGeometry(1.5, 1.5, 7.6, 24), materials.sleeve, [0, 0, 0], station);
+
+    pinion = new THREE.Group();
+    pinion.position.set(pinionX, 0, 0);
+    station.add(pinion);
+
+    const disc = makeMesh(new THREE.CylinderGeometry(PINION_RADIUS * 0.88, PINION_RADIUS * 0.88, 0.8, 32), materials.steel, [0, 0, 0], pinion);
+    disc.rotation.x = Math.PI / 2;
+
+    const toothCount = 18;
+    const toothGeometry = new THREE.BoxGeometry(0.26, 0.38, 0.8);
+    for (let i = 0; i < toothCount; i++) {
+      const angle = i / toothCount * Math.PI * 2;
+      const tooth = makeMesh(toothGeometry, materials.steel, [Math.cos(angle) * PINION_RADIUS * 0.94, Math.sin(angle) * PINION_RADIUS * 0.94, 0], pinion);
+      tooth.rotation.z = angle;
+    }
+
+    const gearbox = new THREE.Group();
+    gearbox.position.set(pinionX, 0, 0);
+    station.add(gearbox);
+    const axle = makeMesh(new THREE.CylinderGeometry(0.14, 0.14, 1.4, 12), materials.steel, [0, 0, 0.7], gearbox);
+    axle.rotation.x = Math.PI / 2;
+    makeMesh(new THREE.BoxGeometry(1.7, 1.7, 0.9), materials.dark, [0, 0, 1.45], gearbox);
+    const generatorShell = makeMesh(new THREE.CylinderGeometry(0.95, 0.95, 1.5, 28), materials.shell, [0, 0, 2.65], gearbox);
+    generatorShell.rotation.x = Math.PI / 2;
+    [-0.6, 0, 0.6].forEach(z => {
+      makeMesh(new THREE.TorusGeometry(0.97, 0.06, 8, 28), materials.steel, [0, 0, 2.65 + z], gearbox);
+    });
+
+    rotor = new THREE.Group();
+    rotor.position.set(0, 0, 2.65);
+    gearbox.add(rotor);
+    const rotorCore = makeMesh(new THREE.CylinderGeometry(0.42, 0.42, 1.4, 20), materials.chrome, [0, 0, 0], rotor);
+    rotorCore.rotation.x = Math.PI / 2;
+    for (let i = 0; i < 4; i++) {
+      const angle = i / 4 * Math.PI * 2;
+      const poleMaterial = material(i % 2 ? 0x3b82f6 : 0xef4444, { metalness: 0.25, roughness: 0.35 });
+      const pole = makeMesh(new THREE.BoxGeometry(0.3, 0.4, 1.3), poleMaterial, [Math.cos(angle) * 0.6, Math.sin(angle) * 0.6, 0], rotor);
+      pole.rotation.z = angle;
+    }
   }
-  if (wire) st.traverse(o => { if (o.isMesh) o.material.wireframe = true; });
-}
 
-/* ----- moving body: buoy ring, pillars, top plate, rack ----- */
-function buildMoving() {
-  while (moving.children.length) moving.remove(moving.children[0]);
-  const R = P.D / 2, Hb = g0.Hb, po = Math.min(6, R - 2.5);
-  const add = (geo, mat, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; moving.add(m); return m; };
-  const prof = [[RI, 0], [R - .5, 0], [R, .5], [R, Hb - .3], [R - .3, Hb], [RI, Hb]].map(p => new THREE.Vector2(p[0], p[1]));
-  moving.add(new THREE.Mesh(new THREE.LatheGeometry(prof, 64), mats.rubber));
-  const st = add(new THREE.TorusGeometry(R + .02, .35, 12, 64), mats.yellow, 0, Hb * .45, 0); st.rotation.x = Math.PI / 2;
-  const cap = add(new THREE.RingGeometry(RI, R - .3, 64), mats.white, 0, Hb + .02, 0); cap.rotation.x = -Math.PI / 2;
-  [[po, po], [-po, po], [po, -po], [-po, -po]].forEach(([x, z]) => add(new THREE.CylinderGeometry(.38, .38, HP - Hb, 16), mats.chrome, x, (HP + Hb) / 2, z));
-  add(new THREE.CylinderGeometry(R - .4, R - .4, 1.2, 48), mats.rubber, 0, HP + .6, 0);
-  const rack = new THREE.Group(); rack.position.set(RX, HP - RACK_L / 2, 0); moving.add(rack);
-  const sp = new THREE.Mesh(new THREE.BoxGeometry(.3, RACK_L, .7), mats.orange); sp.castShadow = true; rack.add(sp);
-  const tg = new THREE.BoxGeometry(.3, .25, .6), n = 85;
-  for (let i = 0; i < n; i++) { const t = new THREE.Mesh(tg, mats.orange); t.position.set(.25, i / n * RACK_L - RACK_L / 2, 0); rack.add(t); }
-  if (wire) moving.traverse(o => { if (o.isMesh) o.material.wireframe = true; });
-}
+  function buildMovingStructure() {
+    while (moving.children.length) moving.remove(moving.children[0]);
 
-/* ----- per-frame updates ----- */
-function updateOcean() {
-  const pos = oceanGeo.attributes.position, comp = W.map(c => { const w = c.m * g0.w; return { a: c.a, k: w * w / G, cs: Math.cos(c.th), sn: Math.sin(c.th), p: c.m * S.ph + c.d }; });
-  for (let i = 0; i < pos.count; i++) {
-    const x = pos.getX(i), z = -pos.getY(i); let h = 0;
-    for (let j = 0; j < comp.length; j++) { const c = comp[j]; h += c.a * Math.cos(c.k * (x * c.cs + z * c.sn) - c.p); }
-    pos.setZ(i, h);
+    const radius = BUOY_RADIUS;
+    const height = BUOY_HEIGHT;
+    const pillarOffset = 6;
+
+    const profile = [
+      [HOLE_RADIUS, 0],
+      [radius - 0.5, 0],
+      [radius, 0.5],
+      [radius, height - 0.3],
+      [radius - 0.3, height],
+      [HOLE_RADIUS, height]
+    ].map(point => new THREE.Vector2(point[0], point[1]));
+    moving.add(new THREE.Mesh(new THREE.LatheGeometry(profile, 64), materials.rubber));
+
+    const trim = makeMesh(new THREE.TorusGeometry(radius + 0.02, 0.35, 12, 64), materials.yellow, [0, height * 0.45, 0], moving);
+    trim.rotation.x = Math.PI / 2;
+
+    const topRing = makeMesh(new THREE.RingGeometry(HOLE_RADIUS, radius - 0.3, 64), materials.white, [0, height + 0.02, 0], moving);
+    topRing.rotation.x = -Math.PI / 2;
+
+    [[pillarOffset, pillarOffset], [-pillarOffset, pillarOffset], [pillarOffset, -pillarOffset], [-pillarOffset, -pillarOffset]].forEach(([x, z]) => {
+      makeMesh(new THREE.CylinderGeometry(0.38, 0.38, HP - height, 16), materials.chrome, [x, (HP + height) / 2, z], moving);
+    });
+
+    makeMesh(new THREE.CylinderGeometry(radius - 0.4, radius - 0.4, 1.2, 48), materials.rubber, [0, HP + 0.6, 0], moving);
+
+    const rack = new THREE.Group();
+    rack.position.set(1, HP - 34 / 2, 0);
+    moving.add(rack);
+    const rackBody = makeMesh(new THREE.BoxGeometry(0.3, 34, 0.7), materials.orange, [0, 0, 0], rack);
+    rackBody.castShadow = true;
+
+    const rackToothGeometry = new THREE.BoxGeometry(0.3, 0.25, 0.6);
+    for (let i = 0; i < 85; i++) {
+      makeMesh(rackToothGeometry, materials.orange, [0.25, i / 85 * 34 - 17, 0], rack);
+    }
+
+    if (wireframe) setWireframe(moving, true);
   }
-  pos.needsUpdate = true; oceanGeo.computeVertexNormals();
-}
-function setCam(key, btn) {
-  document.querySelectorAll('[data-cam]').forEach(b => b.classList.remove('active')); btn.classList.add('active');
-  const p0 = camera.position.clone(), t0 = controls.target.clone(), p1 = new THREE.Vector3(...CAMS[key][0]), t1 = new THREE.Vector3(...CAMS[key][1]), s = performance.now();
-  (function go(now) {
-    const k = Math.min((now - s) / 1000, 1), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
-    camera.position.lerpVectors(p0, p1, e); controls.target.lerpVectors(t0, t1, e); if (k < 1) requestAnimationFrame(go);
-  })(s);
-}
-function frame(now) {
-  requestAnimationFrame(frame);
-  const dt = Math.min(.05, (now - prev) / 1000); prev = now;
-  if (running) { const n = Math.min(20000, Math.round(dt * speed / DT)); for (let i = 0; i < n; i++) step(); }
-  updateOcean();
-  moving.position.y = S.z - g0.d0;           // buoy bottom = heave − equilibrium draft
-  pinion.rotation.z = S.thP;
-  rotor.rotation.z = S.thG / 20;             // visual only: slowed ×20
-  controls.update(); renderer.render(scene, camera); drawCharts(); updateUI(now);
-}
 
-g0 = geo(); updateWaves(); resetState();
-addEventListener('load', () => { initScene(); buildUI(); requestAnimationFrame(frame); });
+  function setWireframe(root, enabled) {
+    root.traverse(object => {
+      if (!object.isMesh) return;
+      const list = Array.isArray(object.material) ? object.material : [object.material];
+      list.forEach(mat => { mat.wireframe = enabled; });
+    });
+  }
+
+  // A smooth visual heave cycle, deliberately independent of physical parameters.
+  function heaveAt(time) {
+    return 1.05 * Math.sin(time * 0.95) + 0.16 * Math.sin(time * 1.55 + 0.7);
+  }
+
+  function waveHeight(x, z, time) {
+    const first = 1.05 * Math.cos(0.15 * x - time * 0.95);
+    const second = 0.34 * Math.cos(0.23 * (x * 0.8 + z * 0.6) - time * 1.42 + 0.8);
+    const third = 0.13 * Math.cos(0.34 * (x * 0.45 - z * 0.9) - time * 1.9 - 0.5);
+    return first + second + third;
+  }
+
+  function updateOcean(time) {
+    const positions = oceanGeo.attributes.position;
+    for (let i = 0; i < positions.count; i++) {
+      const x = positions.getX(i);
+      const z = -positions.getY(i);
+      positions.setZ(i, waveHeight(x, z, time));
+    }
+    positions.needsUpdate = true;
+    oceanGeo.computeVertexNormals();
+  }
+
+  function setCamera(name, button) {
+    document.querySelectorAll('[data-cam]').forEach(item => item.classList.remove('active'));
+    if (button) button.classList.add('active');
+
+    const destination = CAMERAS[name];
+    const startPosition = camera.position.clone();
+    const startTarget = orbit.target.clone();
+    const endPosition = new THREE.Vector3(...destination.position);
+    const endTarget = new THREE.Vector3(...destination.target);
+    const startTime = performance.now();
+    const duration = 850;
+
+    function animateCamera(now) {
+      const progress = Math.min((now - startTime) / duration, 1);
+      const eased = progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+      camera.position.lerpVectors(startPosition, endPosition, eased);
+      orbit.target.lerpVectors(startTarget, endTarget, eased);
+      if (progress < 1) requestAnimationFrame(animateCamera);
+    }
+    requestAnimationFrame(animateCamera);
+  }
+
+  function resetAnimation() {
+    elapsed = 0;
+    generatorAngle = 0;
+    lastHeave = heaveAt(0);
+    moving.position.y = lastHeave - BASE_DRAFT;
+    pinion.rotation.z = -lastHeave / PINION_RADIUS;
+    rotor.rotation.z = 0;
+  }
+
+  function setupControls() {
+    $('btn-pause').addEventListener('click', () => {
+      running = !running;
+      $('btn-pause').innerHTML = running
+        ? '<i class="fa-solid fa-pause"></i> Pause'
+        : '<i class="fa-solid fa-play"></i> Resume';
+    });
+
+    $('btn-reset').addEventListener('click', resetAnimation);
+    $('speed').addEventListener('change', event => {
+      animationSpeed = Number(event.target.value) || 1;
+    });
+
+    document.querySelectorAll('[data-cam]').forEach(button => {
+      button.addEventListener('click', () => setCamera(button.dataset.cam, button));
+    });
+  }
+
+  function onResize() {
+    if (!camera || !renderer) return;
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  }
+
+  function frame(now) {
+    requestAnimationFrame(frame);
+    const delta = Math.min(0.05, Math.max(0, (now - previousFrame) / 1000));
+    previousFrame = now;
+
+    if (running) {
+      const scaledDelta = delta * animationSpeed;
+      elapsed += scaledDelta;
+
+      const currentHeave = heaveAt(elapsed);
+      const verticalMotion = currentHeave - lastHeave;
+
+      // The buoy, support frame, and rack move together.
+      moving.position.y = currentHeave - BASE_DRAFT;
+
+      // The pinion follows the rack; the generator rotor turns in one direction.
+      pinion.rotation.z = -currentHeave / PINION_RADIUS;
+      generatorAngle += Math.abs(verticalMotion) / PINION_RADIUS * GEAR_RATIO_VISUAL;
+      rotor.rotation.z = generatorAngle;
+
+      lastHeave = currentHeave;
+    }
+
+    updateOcean(elapsed);
+    orbit.update();
+    renderer.render(scene, camera);
+  }
+
+  function start() {
+    initScene();
+    setupControls();
+    resetAnimation();
+    requestAnimationFrame(frame);
+  }
+
+  start();
 })();
 </script>
 </body>
